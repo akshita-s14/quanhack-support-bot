@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard | Support HQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.4);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.1);
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.1);
+            --border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(239, 68, 68, 0.1), transparent 25%);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 3rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 3rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .title h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            flex: 1;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-title {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-value.danger { color: var(--danger); }
+        .stat-value.success { color: var(--success); }
+
+        /* Tickets Grid */
+        .tickets-header {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pulse {
+            width: 10px;
+            height: 10px;
+            background-color: var(--danger);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .ticket {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .ticket::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--danger), #f97316);
+        }
+
+        .ticket:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .badge {
+            background: var(--danger-bg);
+            color: var(--danger);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .time {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .customer {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .message-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .message-box p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .message-box p strong {
+            color: var(--text-primary);
+        }
+
+        .reason {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #fca5a5;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 1.5rem;
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem 0;
+            text-align: center;
+            opacity: 0.6;
+        }
+
+        .empty-state.visible {
+            display: flex;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            color: var(--success);
+            margin-bottom: 1.5rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            Support HQ
+        </div>
+        <div class="nav-item active">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Live Escalations
+        </div>
+        <div class="nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Resolved Tickets
+        </div>
+        <div class="nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Settings
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <div class="title">
+                <h1>Human Agent Dashboard</h1>
+                <p>Live monitoring of AI hand-offs and complex customer queries.</p>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-title">Active Escalations</div>
+                <div class="stat-value danger" id="stat-count">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">AI Resolution Rate</div>
+                <div class="stat-value success">94.2%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Avg. Response Time</div>
+                <div class="stat-value">1.4s</div>
+            </div>
+        </div>
+
+        <div class="tickets-header">
+            <div class="pulse" id="pulse-indicator" style="display: none;"></div>
+            Needs Immediate Attention
+        </div>
+
+        <div class="empty-state" id="empty-state">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h2>Inbox Zero!</h2>
+            <p style="margin-top: 8px;">The AI is handling all queries perfectly.<br>No human intervention required right now.</p>
+        </div>
+
+        <div class="grid" id="ticket-grid">
+            <!-- Tickets injected via JS -->
+        </div>
+    </div>
+
+    <script>
+        let currentTickets = [];
+
+        async function fetchEscalations() {
+            try {
+                const response = await fetch('/api/escalations');
+                const data = await response.json();
+                
+                // Only re-render if count changed
+                if (data.length !== currentTickets.length) {
+                    currentTickets = data;
+                    renderTickets();
+                }
+            } catch (err) {
+                console.error("Failed to fetch escalations:", err);
+            }
+        }
+
+        function renderTickets() {
+            const grid = document.getElementById('ticket-grid');
+            const emptyState = document.getElementById('empty-state');
+            const statCount = document.getElementById('stat-count');
+            const pulse = document.getElementById('pulse-indicator');
+
+            statCount.innerText = currentTickets.length;
+
+            if (currentTickets.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.add('visible');
+                pulse.style.display = 'none';
+                return;
+            }
+
+            emptyState.classList.remove('visible');
+            pulse.style.display = 'block';
+            grid.innerHTML = '';
+
+            currentTickets.forEach((t, i) => {
+                const delay = i * 0.1; // Stagger animation
+                const html = `
+                    <div class="ticket" style="animation-delay: ${delay}s">
+                        <div class="ticket-header">
+                            <span class="badge">Requires Human</span>
+                            <span class="time">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                ${t.time}
+                            </span>
+                        </div>
+                        <div class="customer">${t.sender}</div>
+                        
+                        <div class="message-box">
+                            <p><strong>Customer:</strong> "${t.message}"</p>
+                        </div>
+
+                        <div class="reason">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            Flagged: ${t.reason}
+                        </div>
+
+                        <button class="btn" onclick="this.parentElement.style.display='none'; document.getElementById('stat-count').innerText--">
+                            Take Over Chat on WhatsApp
+                        </button>
+                    </div>
+                `;
+                grid.innerHTML += html;
+            });
+        }
+
+        // Poll every 3 seconds
+        setInterval(fetchEscalations, 3000);
+        fetchEscalations(); // Initial load
+    </script>
+</body>
+</html>
