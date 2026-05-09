@@ -1,6 +1,6 @@
-# AI-Powered Customer Support Bot 🤖💬
+# Educational Institutions Enquiry Assistant 🤖🎓
 
-An intelligent, L1 customer support agent that leverages a custom-built RAG (Retrieval-Augmented Generation) C++ engine to handle client queries. The system processes client documents, answers user questions directly via **WhatsApp**, and seamlessly escalates complex or low-confidence queries to a stunning **Human Agent Dashboard**.
+An intelligent, AI-powered enquiry assistant that leverages a custom-built RAG (Retrieval-Augmented Generation) C++ engine to handle student and parent queries. The system processes educational datasets (like Kaggle university FAQs), answers queries directly via **WhatsApp**, and seamlessly escalates complex queries to a stunning **Human Agent Dashboard**.
 
 ## 🌟 Key Features
 
